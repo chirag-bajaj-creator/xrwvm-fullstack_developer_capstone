@@ -59,7 +59,7 @@ def login_user(request):
 # ...
 
 def get_dealership(request,state="All"):
-    if(state="All"):
+    if(state=="All"):
         endpoint="/fetchDealers"
     else:
         endpoint="/fetchDealers/"+state
