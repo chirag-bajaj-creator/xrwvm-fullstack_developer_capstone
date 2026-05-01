@@ -1,22 +1,48 @@
-# Uncomment the imports before you add the code
-from django.urls import path
+import os
+from django.contrib import admin
+from django.urls import path, include, re_path
+from django.views.generic import TemplateView
+from django.views.static import serve
 from django.conf.urls.static import static
 from django.conf import settings
-from . import views
 
-app_name = 'djangoapp'
+FRONTEND_BUILD_DIR = "/home/project/xrwvm-fullstack_developer_capstone/server/frontend/build"
 
 urlpatterns = [
-    # path for login
-    # path(route='login', view=views.login_user, name='login'),
+    # Backend API
+    path('djangoapp/', include('djangoapp.urls')),
+    path('admin/', admin.site.urls),
 
-    # API routes
-    path(route='get_cars', view=views.get_cars, name='getcars'),
+    # Django pages
+    path('', TemplateView.as_view(template_name="Home.html")),
+    path('about/', TemplateView.as_view(template_name="About.html")),
+    path('contact/', TemplateView.as_view(template_name="Contact.html")),
 
-    path(route='get_dealers/', view=views.get_dealership, name='get_dealers'),
-    path(route='get_dealers/<str:state>/', view=views.get_dealership, name='get_dealers_by_state'),
+    # React pages
+    path('login/', TemplateView.as_view(template_name="index.html")),
+    path('register/', TemplateView.as_view(template_name="index.html")),
+    path('dealers/', TemplateView.as_view(template_name="index.html")),
 
-    path(route='dealer/<int:dealer_id>/', view=views.get_dealer_details, name='dealer_details'),
-    path(route='reviews/dealer/<int:dealer_id>/', view=views.get_dealer_reviews, name='dealer_reviews'),
-    path(route='add_review', view=views.add_review, name='add_review'),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    # React public build files
+    re_path(r'^manifest\.json$', serve, {
+        'path': 'manifest.json',
+        'document_root': FRONTEND_BUILD_DIR,
+    }),
+
+    re_path(r'^favicon\.ico$', serve, {
+        'path': 'favicon.ico',
+        'document_root': FRONTEND_BUILD_DIR,
+    }),
+
+    re_path(r'^logo192\.png$', serve, {
+        'path': 'logo192.png',
+        'document_root': FRONTEND_BUILD_DIR,
+    }),
+
+    re_path(r'^logo512\.png$', serve, {
+        'path': 'logo512.png',
+        'document_root': FRONTEND_BUILD_DIR,
+    }),
+]
+
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
